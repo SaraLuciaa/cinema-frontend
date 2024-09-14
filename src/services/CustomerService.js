@@ -1,27 +1,13 @@
+export default new CustomerService();
+
 import axios from 'axios';
 
-const API_URL = "http://localhost:8080/customers";
+const API_URL = 'http://localhost:8080/api/customers';
 
-class CustomerService {
-  getCustomers() {
-    return axios.get(API_URL);
-  }
+const getMovies = () => axios.get(API_URL);
+const getMovieById = (id) => axios.get(`${API_URL}/${id}`);
+const createMovie = (movie) => axios.post(API_URL, customer);
+const updateMovie = (id, movie) => axios.put(`${API_URL}/${id}`, customer);
+const deleteMovie = (id) => axios.delete(`${API_URL}/${id}`);
 
-  getCustomerById(id) {
-    return axios.get(`${API_URL}/${id}`);
-  }
-
-  createCustomer(customer) {
-    return axios.post(API_URL, customer);
-  }
-
-  updateCustomer(id, customer) {
-    return axios.put(`${API_URL}/${id}`, customer);
-  }
-
-  deleteCustomer(id) {
-    return axios.delete(`${API_URL}/${id}`);
-  }
-}
-
-export default new CustomerService();
+export { getCustomers, getCustomerById, createCustomer, updatecustomer, deleteCustomer};
