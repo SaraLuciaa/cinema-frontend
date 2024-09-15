@@ -19,7 +19,7 @@ function HomePage() {
           <Link to="/rooms" className="bg-purple-500 hover:bg-purple-600 text-white py-4 px-6 rounded-lg shadow-md transition duration-300">
             Salas
           </Link>
-          <Link to="/projections" className="bg-red-500 hover:bg-red-600 text-white py-4 px-6 rounded-lg shadow-md transition duration-300">
+          <Link to="/schedules" className="bg-red-500 hover:bg-red-600 text-white py-4 px-6 rounded-lg shadow-md transition duration-300">
             Proyecciones
           </Link>
         </div>

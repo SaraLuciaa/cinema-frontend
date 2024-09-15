@@ -7,10 +7,8 @@ import CustomerForm from './components/CustomerForm';
 import RoomList from './components/RoomList';
 import RoomForm from './components/RoomForm';
 import HomePage from './components/HomePage';
-// Importa tus futuros componentes para Reservaciones, Salas y Proyecciones
-// import ReservationList from './components/ReservationList';
-// import RoomList from './components/RoomList';
-// import ProjectionList from './components/ProjectionList';
+import ScreeningScheduleList from './components/ScreeningScheduleList'; // Asegúrate de importar este componente
+import ScreeningScheduleForm from './components/ScreeningScheduleForm'; // Asegúrate de importar este componente
 
 function App() {
   return (
@@ -27,10 +25,12 @@ function App() {
           <Route path="/movies/new" element={<MovieForm />} />
           <Route path="/movies/edit/:id" element={<MovieForm />} />
           
-          <Route path="/" element={<HomePage />} />
           <Route path="/rooms" element={<RoomList />} />
           <Route path="/rooms/new" element={<RoomForm />} />
           <Route path="/rooms/edit/:id" element={<RoomForm />} />
+
+          <Route path="/schedules" element={<ScreeningScheduleList />} />
+          <Route path="/schedules/new" element={<ScreeningScheduleForm />} />
         </Routes>
       </Router>
     </div>
