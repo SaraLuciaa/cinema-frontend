@@ -42,114 +42,105 @@ const ScreeningScheduleForm = () => {
     } catch (error) {
       setError('Error al cargar las salas: ' + (error.response?.data || error.message));
     }
-  };  
+  };
 
-  const fetchSchedule = async (scheduleId) => {
-    setLoading(true);
+  const fetchSchedule = async (id) => {
     try {
-      const response = await axios.get(`http://localhost:8080/api/schedules/${scheduleId}`);
-      const scheduleData = response.data;
+      const response = await axios.get(`http://localhost:8080/api/schedules/${id}`);
+      const { movie, room, screeningDate, startTime } = response.data;
       setSchedule({
-        movieId: scheduleData.movie.movieId,
-        roomId: scheduleData.room.roomId,
-        screeningDate: scheduleData.screeningDate.split('T')[0], // Formato 'YYYY-MM-DD'
-        startTime: scheduleData.startTime.split('T')[1].slice(0, 5), // Formato 'HH:MM'
+        movieId: movie.movieId,
+        roomId: room.roomId,
+        screeningDate: new Date(screeningDate).toISOString().split('T')[0],
+        startTime: new Date(startTime).toISOString().split('T')[1].substring(0, 5),
       });
     } catch (error) {
-      setError('Error al cargar los datos de la programación: ' + (error.response?.data || error.message));
-    } finally {
-      setLoading(false);
+      setError('Error al cargar la programación: ' + (error.response?.data || error.message));
     }
   };
 
   const handleChange = (e) => {
-    setSchedule({ ...schedule, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setSchedule(prevSchedule => ({
+      ...prevSchedule,
+      [name]: value
+    }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
+  
     try {
-      const url = isEdit ? `http://localhost:8080/api/schedules/${id}` : 'http://localhost:8080/api/schedules';
-      const method = isEdit ? 'put' : 'post';
-      const response = await axios[method](url, {
-        ...schedule,
-        screeningDate: `${schedule.screeningDate}T${schedule.startTime}:00`, // Combina fecha y hora
+      const movie = movies.find(m => m.movieId === parseInt(schedule.movieId));
+      const room = rooms.find(r => r.roomId === parseInt(schedule.roomId));
+    
+      const response = await axios[isEdit ? 'put' : 'post'](`http://localhost:8080/api/schedules${isEdit ? `/${id}` : ''}`, {
+        movie: movie,
+        room: room,
+        screeningDate: schedule.screeningDate,
       });
+  
       navigate('/schedules', { state: { message: `Programación ${isEdit ? 'editada' : 'creada'} con éxito` } });
     } catch (error) {
-      setError('Error al guardar la programación: ' + (error.response?.data || error.message));
+      const errorMsg = error.response?.data?.message || error.message || 'Error desconocido';
+      setError('Error al guardar la programación: ' + errorMsg);
     } finally {
       setLoading(false);
     }
-  };
-
-  if (loading) return <div>Cargando...</div>;
-
+  };  
+  
   return (
     <div>
       <h2 className="text-2xl font-bold mb-4">{isEdit ? 'Editar Programación' : 'Agregar Programación'}</h2>
       {error && <div className="bg-red-100 text-red-800 p-2 mb-4">{error}</div>}
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
-          <label className="block mb-1">Película</label>
+          <label className="block text-gray-700">Película</label>
           <select
             name="movieId"
             value={schedule.movieId}
             onChange={handleChange}
-            className="border p-2 w-full"
-            required
+            className="border p-2 rounded w-full"
           >
-            <option value="">Seleccione una película</option>
+            <option value="">Selecciona una película</option>
             {movies.map(movie => (
               <option key={movie.movieId} value={movie.movieId}>{movie.title}</option>
             ))}
           </select>
         </div>
-
         <div className="mb-4">
-          <label className="block mb-1">Sala</label>
+          <label className="block text-gray-700">Sala</label>
           <select
             name="roomId"
             value={schedule.roomId}
             onChange={handleChange}
-            className="border p-2 w-full"
-            required
+            className="border p-2 rounded w-full"
           >
-            <option value="">Seleccione una sala</option>
+            <option value="">Selecciona una sala</option>
             {rooms.map(room => (
               <option key={room.roomId} value={room.roomId}>{room.roomNumber}</option>
             ))}
           </select>
         </div>
-
         <div className="mb-4">
-          <label className="block mb-1">Fecha de Proyección</label>
+          <label className="block text-gray-700">Fecha</label>
           <input
-            type="date"
+            type="datetime-local"
             name="screeningDate"
             value={schedule.screeningDate}
             onChange={handleChange}
-            className="border p-2 w-full"
-            required
+            className="border p-2 rounded w-full"
           />
         </div>
-
-        <div className="mb-4">
-          <label className="block mb-1">Hora de Inicio</label>
-          <input
-            type="time"
-            name="startTime"
-            value={schedule.startTime}
-            onChange={handleChange}
-            className="border p-2 w-full"
-            required
-          />
-        </div>
-
-        <button type="submit" className="bg-blue-500 text-white p-2 rounded" disabled={loading}>
-          {isEdit ? 'Guardar Cambios' : 'Crear Programación'}
+      
+        <button
+          type="submit"
+          className="bg-blue-500 text-white p-2 rounded"
+          disabled={loading}
+        >
+          {loading ? 'Guardando...' : isEdit ? 'Actualizar' : 'Crear'}
         </button>
       </form>
     </div>
